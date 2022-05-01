@@ -52,6 +52,7 @@ const GLchar* VertexShader =
    "TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n"\
    "}\n"
 };
+
 // Shader-ul de fragment / Fragment shader (este privit ca un sir de caractere)
 const GLchar* FragmentShader =
 {
@@ -67,7 +68,6 @@ const GLchar* FragmentShader =
    "  FragColor =  vec4(ourColor, 1) * mix(texture(texture1, TexCoord), texture(texture2, TexCoord), mixValue);\n"\
    "}\n"
 };
-
 
 void CreateVBO()
 {
@@ -91,61 +91,6 @@ void CreateVBO()
 		0, 1, 4,
 		3, 2, 5
 	};
-
-	/* Cuburi
-	float vertices[] = {
-		0.0f, 0.0f, 1.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-		1.0f, 0.0f, 1.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-		1.0f, 1.0f, 1.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-		0.0f, 1.0f, 1.0f,   1.0f, 0.0f, 0.0f,   0.0f, 1.0f,
-		0.0f, 0.0f, 0.0f,   0.0f, 1.0f, 0.0f,   0.0f, 0.0f,
-		1.0f, 0.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f,
-		1.0f, 1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-		0.0f, 1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f
-	};
-	unsigned int indices[] = {
-	   0,1,2,
-	   0,2,3,
-	   1,5,6,
-	   1,6,2,
-	   5,4,7,
-	   5,7,6,
-	   4,0,3,
-	   4,3,7,
-	   0,5,1,
-	   0,4,5,
-	   3,2,6,
-	   3,6,7
-	};
-	*/
-
-	/* Piramide
-	float vertices[] = {
-		-0.5f,  -0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-		0.0f, 0.5f, -0.4f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-	   0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-		0.0f,  -0.5f, 0.5f,  1.0f, 1.0f, 0.0f,   0.0f, 1.0f,
-
-	};
-	unsigned int indices[] = {
-	   1, 2, 0,
-	   1,3,2,
-	   1,0,3,
-	   3,2,0
-	};*/
-
-	/* Pătrate
-	float vertices[] = {
-	   0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f,
-	   0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f,
-	   -0.5f, -0.5f, 0.0f,  0.0f, 0.0f, 1.0f,   0.0f, 0.0f,
-	   -0.5f,  0.5f, 0.0f,  1.0f, 1.0f, 0.0f,   0.0f, 1.0f
-	};
-	unsigned int indices[] = {
-	   0, 1, 3,
-	   1, 2, 3
-	};*/
-
 
 	glGenVertexArrays(1, &VAO);
 	glGenBuffers(1, &VBO);
@@ -380,15 +325,6 @@ double lastFrame = 0.0f;
 
 int main(int argc, char** argv)
 {
-	objl::Loader loader;
-	bool loadMap = loader.LoadFile("map.obj");
-	if (loadMap == true)
-	{
-		auto vertices = loader.LoadedVertices;
-
-		return 0;
-	}
-
 	std::string strFullExeFileName = argv[0];
 	std::string strExePath;
 	const size_t last_slash_idx = strFullExeFileName.rfind('\\');
@@ -456,23 +392,23 @@ void processInput(GLFWwindow* window)
 		glfwSetWindowShouldClose(window, true);
 
 	if (glfwGetKey(window, GLFW_KEY_UP) == GLFW_PRESS)
-		pCamera->ProcessKeyboard(FORWARD, (float)deltaTime);
+		pCamera->ProcessKeyboard(Camera::CameraMovementType::FORWARD, (float)deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_DOWN) == GLFW_PRESS)
-		pCamera->ProcessKeyboard(BACKWARD, (float)deltaTime);
-	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
-		pCamera->ProcessKeyboard(LEFT, (float)deltaTime);
+		pCamera->ProcessKeyboard(Camera::CameraMovementType::BACKWARD, (float)deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-		pCamera->ProcessKeyboard(RIGHT, (float)deltaTime);
+		pCamera->ProcessKeyboard(Camera::CameraMovementType::RIGHT, (float)deltaTime);
+	if (glfwGetKey(window, GLFW_KEY_LEFT) == GLFW_PRESS)
+		pCamera->ProcessKeyboard(Camera::CameraMovementType::LEFT, (float)deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_PAGE_UP) == GLFW_PRESS)
-		pCamera->ProcessKeyboard(UP, (float)deltaTime);
+		pCamera->ProcessKeyboard(Camera::CameraMovementType::UP, (float)deltaTime);
 	if (glfwGetKey(window, GLFW_KEY_PAGE_DOWN) == GLFW_PRESS)
-		pCamera->ProcessKeyboard(DOWN, (float)deltaTime);
+		pCamera->ProcessKeyboard(Camera::CameraMovementType::DOWN, (float)deltaTime);
 
-	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) {
+	if (glfwGetKey(window, GLFW_KEY_R) == GLFW_PRESS) 
+	{
 		int width, height;
 		glfwGetWindowSize(window, &width, &height);
 		pCamera->Reset(width, height);
-
 	}
 }
 
@@ -508,16 +444,4 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 		g_fMixValue -= 0.1;
 		glUniform1f(MixValueLocation, g_fMixValue);
 	}
-
-	/*if (tolower(key) == 'i' && g_fMixValue < 1.0)
-	{
-		g_fMixValue += 0.1;
-		glUniform1f(MixValueLocation, g_fMixValue);
-	}
-
-	if (tolower(key) == 'd' && g_fMixValue > 0.0)
-	{
-		g_fMixValue -= 0.1;
-		glUniform1f(MixValueLocation, g_fMixValue);
-	}*/
 }

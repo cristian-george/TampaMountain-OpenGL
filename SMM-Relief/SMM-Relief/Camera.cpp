@@ -41,6 +41,15 @@ void Camera::Reshape(int windowWidth, int windowHeight)
 	glViewport(0, 0, windowWidth, windowHeight);
 }
 
+void Camera::Use(Shader* shader)
+{
+	glm::mat4 projection = GetProjectionMatrix();
+	glm::mat4 view = GetViewMatrix();
+	shader->SetMat4("projection", projection);
+	shader->SetMat4("view", view);
+	shader->SetVec3("viewPos", position);
+}
+
 const glm::mat4 Camera::GetViewMatrix() const
 {
 	return glm::lookAt(position, position + forward, up);

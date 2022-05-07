@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include <GLM.hpp>
+#include <glm.hpp>
 #include <gtc/type_ptr.hpp>
-#include <glfw3.h>
+#include "Shader.h"
 
 class Camera
 {
@@ -25,6 +25,8 @@ public:
 	void Reset(const int width, const int height);
 	void Reshape(int windowWidth, int windowHeight);
 
+	void Use(Shader* shader);
+
 	const glm::mat4 GetViewMatrix() const;
 	const glm::mat4 GetProjectionMatrix() const;
 
@@ -33,21 +35,20 @@ public:
 	void ProcessKeyboard(CameraMovementType direction, float deltaTime);
 	void ProcessMouseScroll(float yOffset);
 
-private:
 	void ProcessMouseMovement(float xOffset, float yOffset, bool constrainPitch = true);
 	void UpdateCameraVectors();
 
 private:
 	const float zNEAR = 0.1f;
-	const float zFAR = 500.f;
+	const float zFAR = 5000.f;
 	const float YAW = -90.0f;
 	const float PITCH = 0.0f;
-	const float FOV = 45.0f;
+	const float FOV = 90.0f;
 	glm::vec3 startPosition;
 
 protected:
-	const float cameraSpeedFactor = 2.5f;
-	const float mouseSensitivity = 0.1f;
+	const float cameraSpeedFactor = 100.0f;
+	const float mouseSensitivity = 0.25f;
 
 protected:
 	int width;

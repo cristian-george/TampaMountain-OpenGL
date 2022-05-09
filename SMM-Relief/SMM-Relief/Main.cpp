@@ -28,8 +28,8 @@ Camera* pCamera;
 static glm::vec3 value(0.6f);
 float skyLight = value.x;
 
-Shader shader;
 Shader mapShader;
+Shader skyboxShader;
 
 void ProcessInput(GLFWwindow* window)
 {
@@ -84,21 +84,19 @@ void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods
 		value -= glm::vec3(0.05f);
 	}
 
-	shader.Use();
-	shader.SetVec3("lightColor", value);
+	skyboxShader.Use();
+	skyboxShader.SetVec3("lightColor", value);
 	mapShader.Use();
 	mapShader.SetVec3("lightColor", value);
 
 	skyLight = value.x;
 }
 
-int main()
+bool InitWindow(GLFWwindow*& window)
 {
-	GLFWwindow* window;
-
 	// Initialize the library
 	if (!glfwInit())
-		return -1;
+		return false;
 
 	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Relief", NULL, NULL);
 	glfwMakeContextCurrent(window);
@@ -114,25 +112,156 @@ int main()
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
 
-	pCamera = new Camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 500.0f, 300.0f));
+	return true;
+}
 
-	shader.Set("Basic.shader");
+unsigned int skyboxTexture;
+unsigned int skyboxVAO, skyboxVBO;
+
+void InitSkybox(const std::string& resourcesFolder, const std::vector<std::string>& skyboxFaces)
+{
+	skyboxShader.Set("Skybox.shader");
+
+	const float skyboxVertices[] =
+	{
+		-1.0f, 1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, 1.0f, -1.0f,
+		-1.0f, 1.0f, -1.0f,
+
+		-1.0f, -1.0f, 1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, 1.0f, -1.0f,
+		-1.0f, 1.0f, -1.0f,
+		-1.0f, 1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, -1.0f, 1.0f,
+		-1.0f, -1.0f, 1.0f,
+
+		-1.0f, 1.0f, -1.0f,
+		1.0f, 1.0f, -1.0f,
+		1.0f, 1.0f, 1.0f,
+		1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, 1.0f,
+		-1.0f, 1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f, 1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f, 1.0f,
+		1.0f, -1.0f, 1.0f
+	};
+
+	glGenVertexArrays(1, &skyboxVAO);
+	glGenBuffers(1, &skyboxVBO);
+	glBindVertexArray(skyboxVAO);
+	glBindBuffer(GL_ARRAY_BUFFER, skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices, GL_STATIC_DRAW);
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+
+	skyboxTexture = CreateSkyboxTexture(skyboxFaces);
+	skyboxShader.SetInt("skybox", 0);
+}
+
+void RenderSkybox(unsigned int skyboxTexture)
+{
+	glDepthFunc(GL_LEQUAL);
+	skyboxShader.Use();
+
+	glm::mat4 viewMatrix = glm::mat4(glm::mat3(pCamera->GetViewMatrix()));
+	glm::mat4 projMatrix = pCamera->GetProjectionMatrix();
+
+	skyboxShader.SetMat4("view", viewMatrix);
+	skyboxShader.SetMat4("projection", projMatrix);
+
+	glBindVertexArray(skyboxVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, skyboxTexture);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
+}
+
+unsigned int mapTexture;
+
+void InitMap(Mesh& map, const std::string& resourcesFolder)
+{
 	mapShader.Set("Map.shader");
+
+	mapTexture = CreateTexture(resourcesFolder + "\\MapTexture\\GOOGLE_SAT_WM.jpg");
+	mapShader.SetInt("map", 1);
+
+	map.SetScale(glm::vec3(0.2f, 0.2f, 0.2f));
+	map.SetPosition(glm::vec3(0.0f));
+	map.InitVAO();
+}
+
+void RenderMap(Mesh& map, unsigned int mapTexture)
+{
+	mapShader.Use();
+	pCamera->UpdateCameraVectors();
+	pCamera->Use(&mapShader);
+	glBindTexture(GL_TEXTURE_2D, mapTexture);
+	map.Render(&mapShader);
+}
+
+int main()
+{
+	GLFWwindow* window;
+	if (!InitWindow(window))
+	{
+		std::cout << "Couldn't initialize GLFW window !" << std::endl;
+		return 0;
+	}
+
+	pCamera = new Camera(SCR_WIDTH, SCR_HEIGHT, glm::vec3(0.0f, 400.0f, 300.0f));
 
 	std::filesystem::path localPath = std::filesystem::current_path();
 	std::string resourcesFolder = localPath.string() + "\\Resources";
 
-	int mapTexture = CreateTexture(resourcesFolder + "\\MapTexture\\GOOGLE_SAT_WM.jpg");
-	mapShader.SetInt("mapTexture", 0);
+	// Skybox initialization zone
+	//std::vector<std::string> skyboxFaces
+	//{
+	//	resourcesFolder + "\\SkyboxTexture\\_right.png",
+	//	resourcesFolder + "\\SkyboxTexture\\_left.png",
+	//	resourcesFolder + "\\SkyboxTexture\\_top.png",
+	//	resourcesFolder + "\\SkyboxTexture\\_bottom.png",
+	//	resourcesFolder + "\\SkyboxTexture\\_front.png",
+	//	resourcesFolder + "\\SkyboxTexture\\_back.png"
+	//};
 
+	std::vector<std::string> skyboxFaces
+	{
+		resourcesFolder + "\\SkyboxTexture\\Left.jpg",
+		resourcesFolder + "\\SkyboxTexture\\Right.jpg",
+		resourcesFolder + "\\SkyboxTexture\\Up.jpg",
+		resourcesFolder + "\\SkyboxTexture\\Down.jpg",
+		resourcesFolder + "\\SkyboxTexture\\Front.jpg",
+		resourcesFolder + "\\SkyboxTexture\\Back.jpg"
+	};
+
+	InitSkybox(resourcesFolder, skyboxFaces);
+	skyboxShader.Use();
+	skyboxShader.SetVec3("lightColor", glm::vec3(0.6f, 0.6f, 0.6f));
+
+	// Terrain initialization zone
 	Mesh map("map.obj");
-	map.SetScale(glm::vec3(0.2f, 0.2f, 0.2f));
-	map.SetPosition(glm::vec3(0.0f));
-	map.InitVAO();
-
-	shader.Use();
-	shader.SetVec3("lightColor", glm::vec3(0.6f, 0.6f, 0.6f));
-
+	InitMap(map, resourcesFolder);
 	mapShader.Use();
 	mapShader.SetVec3("lightColor", glm::vec3(0.6f, 0.6f, 0.6f));
 
@@ -154,22 +283,16 @@ int main()
 		ProcessInput(window);
 
 		// Render here
-		mapShader.Use();
-		pCamera->UpdateCameraVectors();
-		pCamera->Use(&mapShader);
-		glBindTexture(GL_TEXTURE_2D, mapTexture);
-
-		map.Render(&mapShader);
-		shader.Use();
-		pCamera->Use(&shader);
+		RenderMap(map, mapTexture);
+		RenderSkybox(skyboxTexture);
 
 		// Swap front and back buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();
 	}
 
-	shader.Delete();
 	mapShader.Delete();
+	skyboxShader.Delete();
 	glfwTerminate();
 
 	delete pCamera;

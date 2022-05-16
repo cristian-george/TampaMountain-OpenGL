@@ -30,6 +30,7 @@ float skyLight = value.x;
 
 Shader mapShader;
 Shader skyboxShader;
+Shader signShader;
 
 void ProcessInput(GLFWwindow* window)
 {
@@ -108,6 +109,9 @@ bool InitWindow(GLFWwindow*& window)
 	glfwSetCursorPosCallback(window, MouseCallback);
 	glfwSetScrollCallback(window, ScrollCallback);
 	glfwSetKeyCallback(window, KeyCallback);
+
+	glfwSetCursorPos(window, static_cast<double>(SCR_WIDTH) / 2, static_cast<double>(SCR_HEIGHT) / 2);
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
@@ -201,7 +205,7 @@ unsigned int mapTexture;
 
 void InitMap(Mesh& map, const std::string& resourcesFolder)
 {
-	mapShader.Set("Map.shader");
+	mapShader.Set("Texture.shader");
 
 	mapTexture = CreateTexture(resourcesFolder + "\\MapTexture\\GOOGLE_SAT_WM.jpg");
 	mapShader.SetInt("map", 1);
@@ -211,13 +215,37 @@ void InitMap(Mesh& map, const std::string& resourcesFolder)
 	map.InitVAO();
 }
 
-void RenderMap(Mesh& map, unsigned int mapTexture)
+void RenderMap(Mesh& map)
 {
 	mapShader.Use();
 	pCamera->UpdateCameraVectors();
 	pCamera->Use(&mapShader);
 	glBindTexture(GL_TEXTURE_2D, mapTexture);
 	map.Render(&mapShader);
+}
+
+unsigned int signTexture;
+
+void InitSign(Mesh& sign, const std::string& resourcesFolder)
+{
+	signShader.Set("Texture.shader");
+
+	signTexture = CreateTexture(resourcesFolder + "\\white.jpg");
+	signShader.SetInt("sign", 2);
+
+	sign.SetScale(glm::vec3(15.0f, 15.0f, 15.0f));
+	sign.SetPosition(glm::vec3(-45.0f, 260.0f, 0.0f));
+	sign.SetRotation(glm::vec3(0.0f, 215.0f, 0.0f));
+	sign.InitVAO();
+}
+
+void RenderSign(Mesh& sign)
+{
+	signShader.Use();
+	pCamera->UpdateCameraVectors();
+	pCamera->Use(&signShader);
+	glBindTexture(GL_TEXTURE_2D, signTexture);
+	sign.Render(&signShader);
 }
 
 int main()
@@ -265,6 +293,12 @@ int main()
 	mapShader.Use();
 	mapShader.SetVec3("lightColor", glm::vec3(0.6f, 0.6f, 0.6f));
 
+	//Sign
+	Mesh sign("sign.obj");
+	InitSign(sign, resourcesFolder);
+	signShader.Use();
+	signShader.SetVec3("lightColor", glm::vec3(0.6f, 0.6f, 0.6f));
+
 	while (!glfwWindowShouldClose(window))
 	{
 		// Per-frame time logic
@@ -283,8 +317,9 @@ int main()
 		ProcessInput(window);
 
 		// Render here
-		RenderMap(map, mapTexture);
+		RenderMap(map);
 		RenderSkybox(skyboxTexture);
+		RenderSign(sign);
 
 		// Swap front and back buffers
 		glfwSwapBuffers(window);
@@ -293,6 +328,7 @@ int main()
 
 	mapShader.Delete();
 	skyboxShader.Delete();
+	signShader.Delete();
 	glfwTerminate();
 
 	delete pCamera;

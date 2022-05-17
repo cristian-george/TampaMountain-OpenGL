@@ -142,22 +142,30 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Application.cpp" />
     <ClCompile Include="Camera.cpp" />
-    <ClCompile Include="Material.cpp" />
+    <ClCompile Include="InscriptionSign.cpp" />
     <ClCompile Include="Mesh.cpp" />
+    <ClCompile Include="ProcessInput.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Skybox.cpp" />
+    <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TextureLoader.cpp" />
-    <ClCompile Include="Vertex.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Application.h" />
     <ClInclude Include="Camera.h" />
+    <ClInclude Include="InscriptionSign.h" />
     <ClInclude Include="Material.h" />
     <ClInclude Include="Mesh.h" />
     <ClInclude Include="MTLLoader.h" />
     <ClInclude Include="OBJLoader.h" />
+    <ClInclude Include="ProcessInput.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="ShaderSource.h" />
+    <ClInclude Include="Skybox.h" />
+    <ClInclude Include="Terrain.h" />
     <ClInclude Include="TextureLoader.h" />
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
@@ -171,9 +179,18 @@
     <None Include="Basic.shader">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </None>
+    <None Include="sign.mtl">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
+    <None Include="Skybox.shader">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Object Include="map.obj">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </Object>
+    <Object Include="sign.obj">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
     </Object>
   </ItemGroup>

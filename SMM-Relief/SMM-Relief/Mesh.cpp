@@ -2,17 +2,10 @@
 #include <ext/matrix_transform.hpp>
 #include "OBJLoader.h"
 
-void Mesh::InitVertexData(Vertex* vertexArray, const unsigned& numberOfVertices, GLuint* indexArray, const unsigned& numberOfIndices)
+void Mesh::InitVertexData(const std::vector<Vertex>& vertices, const std::vector<GLuint>& indices)
 {
-	for (size_t index = 0; index < numberOfVertices; ++index)
-	{
-		vertices.push_back(vertexArray[index]);
-	}
-
-	for (size_t index = 0; index < numberOfIndices; ++index)
-	{
-		indices.push_back(indexArray[index]);
-	}
+	this->vertices = vertices;
+	this->indices = indices;
 }
 
 void Mesh::InitMaterials()
@@ -108,12 +101,12 @@ void Mesh::InitVAO()
 	glBindVertexArray(0);
 }
 
-void Mesh::Render(Shader* shader)
+void Mesh::Render(Shader& shader)
 {
-	shader->Use();
+	shader.Use();
 	UpdateModelMatrix();
 
-	shader->SetMat4("model", modelMatrix);
+	shader.SetMat4("model", modelMatrix);
 	glBindVertexArray(VAO);
 	if (indices.empty())
 	{

@@ -25,7 +25,7 @@ public:
 	void Reset(const int width, const int height);
 	void Reshape(int windowWidth, int windowHeight);
 
-	void Use(Shader* shader);
+	void Use(Shader& shader);
 
 	const glm::mat4 GetViewMatrix() const;
 	const glm::mat4 GetProjectionMatrix() const;
@@ -47,7 +47,7 @@ private:
 	glm::vec3 startPosition;
 
 protected:
-	const float cameraSpeedFactor = 100.0f;
+	const float cameraSpeedFactor = 50.0f;
 	const float mouseSensitivity = 0.25f;
 
 protected:

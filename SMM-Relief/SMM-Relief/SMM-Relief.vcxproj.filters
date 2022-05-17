@@ -21,19 +21,28 @@
     <ClCompile Include="Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Vertex.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Mesh.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Material.cpp">
+    <ClCompile Include="TextureLoader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="TextureLoader.cpp">
+    <ClCompile Include="Skybox.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Terrain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="InscriptionSign.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProcessInput.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,6 +74,21 @@
     <ClInclude Include="TextureLoader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Skybox.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Terrain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProcessInput.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="InscriptionSign.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Application.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Basic.shader">
@@ -76,9 +100,18 @@
     <None Include="map.mtl">
       <Filter>Resource Files</Filter>
     </None>
+    <None Include="Skybox.shader">
+      <Filter>Resource Files</Filter>
+    </None>
+    <None Include="sign.mtl">
+      <Filter>Resource Files</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Object Include="map.obj">
+      <Filter>Resource Files</Filter>
+    </Object>
+    <Object Include="sign.obj">
       <Filter>Resource Files</Filter>
     </Object>
   </ItemGroup>

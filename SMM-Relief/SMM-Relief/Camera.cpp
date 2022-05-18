@@ -50,6 +50,11 @@ void Camera::Use(Shader& shader)
 	shader.SetVec3("viewPos", position);
 }
 
+const glm::vec3 Camera::GetPosition() const
+{
+	return position;
+}
+
 const glm::mat4 Camera::GetViewMatrix() const
 {
 	return glm::lookAt(position, position + forward, up);

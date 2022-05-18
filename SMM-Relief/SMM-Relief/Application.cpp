@@ -3,9 +3,9 @@
 Camera* Application::camera = nullptr;
 Shader Application::skyboxShader;
 Shader Application::mapShader;
-Shader Application::signShader;
+Shader Application::rainbowShader;
 
-void Application::Start()
+void Application::Run()
 {
 	if (!InitWindow())
 	{
@@ -21,8 +21,9 @@ void Application::Start()
 	Skybox skybox(resourcesFolder, skyboxShader);
 	Terrain terrain(resourcesFolder, mapShader);
 	InscriptionSign inscriptionSign(resourcesFolder, signShader);
+	Rainbow rainbow(resourcesFolder, rainbowShader);
 
-	Render(skybox, terrain, inscriptionSign);
+	Render(skybox, terrain, inscriptionSign, rainbow);
 }
 
 Application::~Application()
@@ -30,6 +31,7 @@ Application::~Application()
 	mapShader.Delete();
 	skyboxShader.Delete();
 	signShader.Delete();
+	rainbowShader.Delete();
 	glfwTerminate();
 
 	delete camera;
@@ -39,6 +41,10 @@ bool Application::InitWindow()
 {
 	if (!glfwInit())
 		return false;
+
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	window = glfwCreateWindow(SCR_WIDTH, SCR_HEIGHT, "Explorare relief real", NULL, NULL);
 	glfwMakeContextCurrent(window);
@@ -55,13 +61,14 @@ bool Application::InitWindow()
 	glfwSetCursorPos(window, static_cast<double>(SCR_WIDTH) / 2, static_cast<double>(SCR_HEIGHT) / 2);
 	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-	glDisable(GL_BLEND);
 	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	return true;
 }
 
-void Application::Render(Skybox& skybox, Terrain& terrain, InscriptionSign& inscriptionSign)
+void Application::Render(Skybox& skybox, Terrain& terrain, InscriptionSign& inscriptionSign, Rainbow& rainbow)
 {
 	while (!glfwWindowShouldClose(window))
 	{
@@ -82,8 +89,9 @@ void Application::Render(Skybox& skybox, Terrain& terrain, InscriptionSign& insc
 
 		// Render here
 		terrain.Render(camera, mapShader);
-		skybox.Render(camera, skyboxShader);
 		inscriptionSign.Render(camera, signShader);
+		skybox.Render(camera, skyboxShader);
+		rainbow.Render(camera, rainbowShader);
 
 		// Swap front and back buffers
 		glfwSwapBuffers(window);
@@ -122,6 +130,8 @@ void Application::KeyCallback(GLFWwindow* window, int key, int scancode, int act
 	skyboxShader.SetVec3("lightColor", lightIntensityValue);
 	mapShader.Use();
 	mapShader.SetVec3("lightColor", lightIntensityValue);
+	rainbowShader.Use();
+	rainbowShader.SetVec3("lightColor", lightIntensityValue);
 
 	skyLight = lightIntensityValue.x;
 }

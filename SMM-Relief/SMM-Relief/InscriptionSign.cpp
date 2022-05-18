@@ -5,7 +5,7 @@ InscriptionSign::InscriptionSign(const std::string& resourcesFolder, Shader& sig
 	InitInscriptionSign(resourcesFolder, signShader);
 
 	signShader.Use();
-	signShader.SetVec3("lightColor", glm::vec3(0.6f, 0.6f, 0.6f));
+	signShader.SetVec3("lightColor", glm::vec3(0.7f, 0.7f, 0.7f));
 }
 
 void InscriptionSign::Render(Camera* camera, Shader& signShader)

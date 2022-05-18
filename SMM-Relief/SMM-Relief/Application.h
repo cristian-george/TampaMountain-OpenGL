@@ -1,8 +1,4 @@
 #pragma once
-#include <GL/glew.h>
-#include <glfw3.h>
-#include <glm.hpp>
-
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -17,6 +13,7 @@
 #include "Skybox.h"
 #include "Terrain.h"
 #include "InscriptionSign.h"
+#include "Rainbow.h"
 #include "ProcessInput.cpp"
 
 const unsigned int SCR_WIDTH = 1920;
@@ -31,28 +28,28 @@ static float skyLight = lightIntensityValue.x;
 class Application
 {
 public:
-	Application() = default;
+    Application() = default;
+    ~Application();
 
-	void Start();
-
-	~Application();
-
-private:
-	bool InitWindow();
-
-	void Render(Skybox& skybox, Terrain& terrain, InscriptionSign& inscriptionSign);
-
-	static void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
-	static void MouseCallback(GLFWwindow* window, double xpos, double ypos);
-	static void ScrollCallback(GLFWwindow* window, double xoffset, double yOffset);
-	static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+    void Run();
 
 private:
-	GLFWwindow* window;
-	static Camera* camera;
+    bool InitWindow();
+
+    void Render(Skybox& skybox, Terrain& terrain, InscriptionSign& inscriptionSign, Rainbow& rainbow);
+
+    static void FrameBufferSizeCallback(GLFWwindow* window, int width, int height);
+    static void MouseCallback(GLFWwindow* window, double xpos, double ypos);
+    static void ScrollCallback(GLFWwindow* window, double xoffset, double yOffset);
+    static void KeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 
 private:
-	static Shader skyboxShader;
-	static Shader mapShader;
-	static Shader signShader;
+    GLFWwindow* window;
+    static Camera* camera;
+
+private:
+    static Shader skyboxShader;
+    static Shader mapShader;
+    static Shader rainbowShader;
+    Shader signShader;
 };

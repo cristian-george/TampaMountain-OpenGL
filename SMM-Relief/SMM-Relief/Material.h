@@ -1,6 +1,4 @@
 #pragma once
-#include <glm.hpp>
-#include <GL/glew.h>
 
 class Material
 {

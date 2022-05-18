@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include "ShaderSource.h"
+#define GLM_FORCE_CTOR_INIT
 #include <glm.hpp>
 
 class Shader
